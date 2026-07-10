@@ -3,11 +3,20 @@
 mirror（`/Users/mac/Documents/flutter/bixing/mirror_frontend`）"发行动"功能的 Go 命令行客户端。
 纯标准库、零依赖、单二进制。也是 winik-server 调 mirror 接口的参考实现。
 
-## 构建
+## 安装（用户视角）
+
+```bash
+# 一键安装（需 repo 已发布 Release）
+curl -fsSL https://raw.githubusercontent.com/BIXING-CODE/winik-cli/main/install.sh | sh
+
+# 或到 Releases 页手动下载对应平台二进制
+```
+
+## 构建（开发视角）
 
 ```bash
 go build -o winik-cli .
-# 交叉编译 linux（部署到服务器时）：GOOS=linux GOARCH=amd64 go build -o winik-cli-linux .
+# 发布新版本：git tag v0.1.0 && git push --tags  → GitHub Actions 自动编全平台二进制挂 Releases
 ```
 
 ## 用法
