@@ -11,22 +11,33 @@ import (
 	"github.com/BIXING-CODE/winik-cli/internal/mirror"
 )
 
-// Login 走 require-verify-code + login 两步，token 落盘。
+// Login 走 require-verify-code + login 两步，token 落盘；--token 直接写入跳过登录。
 func Login(args []string) error {
 	fs := flag.NewFlagSet("login", flag.ExitOnError)
-	phone := fs.String("phone", "", "手机号（必填）")
+	phone := fs.String("phone", "", "手机号（与 --token 二选一）")
 	country := fs.String("country", "86", "国家码")
+	token := fs.String("token", "", "直接写入已有 token，跳过验证码登录")
 	prod := fs.Bool("prod", false, "使用生产环境（默认测试环境 test-app）")
 	if err := fs.Parse(args); err != nil {
 		return err
-	}
-	if *phone == "" {
-		return fmt.Errorf("--phone 必填")
 	}
 
 	baseURL := mirror.BaseURLTest
 	if *prod {
 		baseURL = mirror.BaseURLProd
+	}
+
+	if *token != "" {
+		cfg := &config.Config{BaseURL: baseURL, Token: *token}
+		if err := cfg.Save(); err != nil {
+			return err
+		}
+		fmt.Printf("token 已写入 ~/.winik-cli/config.json（环境 %s），可用 winik-cli whoami 验证\n", baseURL)
+		return nil
+	}
+
+	if *phone == "" {
+		return fmt.Errorf("--phone 与 --token 必填其一")
 	}
 	client := mirror.New(baseURL, "")
 
