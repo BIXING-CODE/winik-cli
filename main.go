@@ -7,15 +7,16 @@ import (
 	"github.com/BIXING-CODE/winik-cli/cmd"
 )
 
-const usage = `winik-cli — mirror 发行动命令行工具
+const usage = `winik-cli — bixing(mirror) / winik 双服务命令行工具
 
 用法:
-  winik-cli login      登录 mirror 账号（保存 token 到 ~/.winik-cli/config.json）
-  winik-cli action     发布一条行动（--title/--content/--cover/...，见 action -h）
-  winik-cli whoami     查看当前登录用户
+  winik-cli login bixing   登录 mirror（--phone 验证码 或 --token 直填；--prod 切生产）
+  winik-cli login winik    登录 winik（--email 验证码 或 --token 直填；--intl 切海外区）
+  winik-cli action         发布一条行动到 bixing（--title/--content/--cover/...，见 action -h）
+  winik-cli whoami         查看登录态（可跟 bixing / winik，缺省都查）
 
 全局:
-  配置文件 ~/.winik-cli/config.json（base_url + token）
+  配置文件 ~/.winik-cli/config.json（按服务分存 base_url + token）
 `
 
 func main() {

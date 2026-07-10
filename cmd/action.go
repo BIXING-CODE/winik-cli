@@ -60,10 +60,10 @@ func Action(args []string) error {
 	if err != nil {
 		return err
 	}
-	if cfg.Token == "" {
-		return fmt.Errorf("未登录，先执行 winik-cli login --phone <手机号>")
+	if cfg.Bixing.Token == "" {
+		return fmt.Errorf("未登录 bixing，先执行 winik-cli login bixing --phone <手机号> 或 --token <token>")
 	}
-	client := mirror.New(cfg.BaseURL, cfg.Token)
+	client := mirror.New(cfg.Bixing.BaseURL, cfg.Bixing.Token)
 
 	// 1. 封面
 	coverImage := *coverURL
