@@ -4,7 +4,7 @@ package mirror
 // startAt 与 timeRangeDesc 二选一；startAt 线格式 "yyyy-MM-dd HH:mm:ss"。
 // mode: 0=OFFLINE 1=ONLINE；visibleStatus: 0=self 1=public。
 type ActionRequest struct {
-	ID            *int     `json:"id"` // app 端此字段永远发送（新建为 null），保持一致
+	ID            *int     `json:"id,omitempty"`
 	VisibleStatus *int     `json:"visibleStatus,omitempty"`
 	Title         string   `json:"title,omitempty"`
 	Content       string   `json:"content,omitempty"`
