@@ -24,6 +24,8 @@ go build -o winik-cli .
 ```bash
 # 1. 登录（默认测试环境 test-app.bixing.com.cn，--prod 切生产）
 ./winik-cli login --phone 13800138000
+# 或直接填已有 token 跳过验证码（app 抓包 header 里的 token 字段）
+./winik-cli login --token "xxx" [--prod]
 
 # 2. 发行动（本地图片自动上传 COS + 注册 fragment）
 ./winik-cli action \
