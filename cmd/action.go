@@ -26,9 +26,12 @@ func Action(args []string) error {
 	fs.Var(&images, "image", "附加图片本地路径（可重复）")
 	timeDesc := fs.String("time-desc", "", "时间文字描述（与 --start-at 二选一，必填其一）")
 	startAt := fs.String("start-at", "", `具体开始时间 "2026-07-15 19:00"`)
-	location := fs.String("location", "", "线下地点名称")
-	lat := fs.Float64("lat", 0, "纬度")
-	lng := fs.Float64("lng", 0, "经度")
+	location := fs.String("location", "", "线下地点名称（手动模式，需配 --lat/--lng）")
+	lat := fs.Float64("lat", 0, "纬度（bd09ll 百度坐标系）")
+	lng := fs.Float64("lng", 0, "经度（bd09ll 百度坐标系）")
+	place := fs.String("place", "", "地点关键词，自动经百度检索取第一个 POI（推荐，先用 place 命令预览）")
+	placeCity := fs.String("place-city", "北京", "配合 --place 的检索城市")
+	placeIndex := fs.Int("place-index", 0, "取百度检索第 N 个结果（place 命令输出的序号）")
 	online := fs.Bool("online", false, "线上碰面（默认线下，线下需 --location/--lat/--lng）")
 	price := fs.String("price", "", "价格（必填，字符串）")
 	selfOnly := fs.Bool("self", false, "仅自己可见（默认公开）")
@@ -52,8 +55,30 @@ func Action(args []string) error {
 			return fmt.Errorf(`--start-at 格式须为 "2026-07-15 19:00": %w`, err)
 		}
 	}
-	if !*online && *location == "" {
-		return fmt.Errorf("线下行动需 --location（或改用 --online）")
+	if !*online && *location == "" && *place == "" {
+		return fmt.Errorf("线下行动需 --place（自动解析）或 --location + --lat/--lng（或改用 --online）")
+	}
+	if !*online && *place == "" && (*lat == 0 || *lng == 0) {
+		return fmt.Errorf("手动指定 --location 时必须同时给 --lat/--lng（否则 app 端点开地点会报错）；推荐改用 --place 自动解析")
+	}
+
+	// --place: 百度地点检索解析出真实 POI（名称 + bd09ll 经纬度），与 app 选点同源
+	if *place != "" && !*online {
+		places, err := mirror.SearchPlaces(*place, *placeCity)
+		if err != nil {
+			return fmt.Errorf("百度地点检索失败: %w", err)
+		}
+		if len(places) == 0 {
+			return fmt.Errorf("「%s」在 %s 无检索结果，换 --place-city 或先用 place 命令预览", *place, *placeCity)
+		}
+		if *placeIndex >= len(places) {
+			return fmt.Errorf("--place-index %d 超出结果数 %d", *placeIndex, len(places))
+		}
+		p := places[*placeIndex]
+		*location = p.Name
+		*lat, *lng = p.Location.Lat, p.Location.Lng
+		fmt.Printf("地点解析: %s（%s%s%s · %s）lat=%.6f lng=%.6f\n",
+			p.Name, p.Province, p.City, p.Area, p.Address, *lat, *lng)
 	}
 
 	cfg, err := config.Load()
