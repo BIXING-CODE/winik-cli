@@ -1,7 +1,8 @@
 package mirror
 
 // ActionRequest 对应 mirror 的 POST /v1/user/action 请求体（camelCase，空值省略）。
-// startAt 与 timeRangeDesc 二选一；startAt 线格式 "yyyy-MM-dd HH:mm:ss"。
+// startAt 与 timeRangeDesc 二选一；startAt **写入**线格式是 ISO8601
+// ("2026-07-15T19:00:00.000")，空格格式必 451——"yyyy-MM-dd HH:mm:ss" 只是后端返回格式。
 // mode: 0=OFFLINE 1=ONLINE；visibleStatus: 0=self 1=public。
 type ActionRequest struct {
 	ID            *int     `json:"id,omitempty"`

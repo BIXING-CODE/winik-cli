@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/BIXING-CODE/winik-cli/internal/config"
@@ -135,7 +136,9 @@ func Action(args []string) error {
 		VisibleStatus: &visible,
 	}
 	if *startAt != "" {
-		req.StartAt = *startAt + ":00" // 线格式 yyyy-MM-dd HH:mm:ss
+		// 写入线格式是 ISO8601("2026-07-15T19:00:00.000"),空格格式必 451(实测);
+		// "yyyy-MM-dd HH:mm:ss" 只是后端返回格式
+		req.StartAt = strings.Replace(*startAt, " ", "T", 1) + ":00.000"
 		req.TimeRangeDesc = ""
 	}
 	if *lat != 0 || *lng != 0 {
