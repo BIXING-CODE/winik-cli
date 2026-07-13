@@ -60,7 +60,8 @@ go build -o winik-cli .
 - Base：`https://app.bixing.com.cn`（prod）/ `https://test-app.bixing.com.cn`（test），路径前缀 `/v1`
 - 鉴权：header `token: <raw>`（无 Bearer）；登录 `POST /v1/auth/require-verify-code` → `POST /v1/auth/login`
 - 信封：`{code, message, data}`，code 0/200 成功
-- 发行动：`POST /v1/user/action`（ActionRequest，camelCase；startAt 与 timeRangeDesc 二选一，startAt 线格式 `yyyy-MM-dd HH:mm:ss`；mode 0=线下/1=线上；visibleStatus 0=self/1=public）
+- 发行动：`POST /v1/user/action`（ActionRequest，camelCase；startAt 与 timeRangeDesc 二选一；mode 0=线下/1=线上；visibleStatus 0=self/1=public）
+- **startAt 读写格式不对称（v0.3.2 修，实测踩坑）**：后端**返回**用 `yyyy-MM-dd HH:mm:ss`，**写入**只收 ISO8601（`2026-07-15T19:00:00.000`，mirror app 端 `toIso8601String()` 同款）——空格格式必 `451 参数错误`。CLI `--start-at` 入参仍是 `"2026-07-15 19:00"`，出线自动转 ISO
 - 图片：`POST /v1/upload/get-cos-cert`（scopeType=Fragment/metaType=Picture，PascalCase）→ 腾讯云 COS PUT（q-sign HMAC-SHA1 + x-cos-security-token）→ `POST /v1/user/fragment/batch-save` 得 fragment id / sourceUrl
 - 地点：百度地图 `GET place/v3/region`（server AK 同 app 端 `AppConfig.baiduMapServerKey`），坐标系 **bd09ll**，线下行动的 location/lat/lng 三件套缺一不可（否则 app 端点开地点报错）
 - 参照实现：`mirror_frontend/lib/app/action/create_action_v2/create_action_v2_controller.dart` + `data/apis/api_user_provider.dart` + `core/net/mr_net.dart` + `core/utils/cos_utils.dart`
